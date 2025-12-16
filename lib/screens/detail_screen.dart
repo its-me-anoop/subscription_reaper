@@ -149,6 +149,7 @@ class _DetailScreenState extends State<DetailScreen>
       active: _isReaping,
       child: Scaffold(
         backgroundColor: AppTheme.kColorBackground,
+        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
@@ -181,7 +182,7 @@ class _DetailScreenState extends State<DetailScreen>
                 // Since the provider updates the object in place, and this widget holds a reference,
                 // we might see stale data unless we pop or listen.
                 // Simplest UX: Pop back to dashboard to see changes.
-                if (mounted) {
+                if (context.mounted) {
                   Navigator.pop(context);
                 }
               },
