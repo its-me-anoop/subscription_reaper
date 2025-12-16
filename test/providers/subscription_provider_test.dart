@@ -2,11 +2,14 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:subscription_reaper/models/subscription.dart';
 import 'package:subscription_reaper/providers/subscription_provider.dart';
 
+import 'package:shared_preferences/shared_preferences.dart';
+
 void main() {
   group('SubscriptionProvider Tests', () {
     late SubscriptionProvider provider;
 
     setUp(() {
+      SharedPreferences.setMockInitialValues({});
       provider = SubscriptionProvider();
     });
 

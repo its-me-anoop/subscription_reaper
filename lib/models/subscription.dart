@@ -89,4 +89,28 @@ class Subscription {
     if (billingCycle == BillingCycle.yearly) return cost;
     return cost * 12;
   }
+
+  /// Converts the subscription to a JSON map.
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'cost': cost,
+      'billingCycle': billingCycle.index,
+      'renewalDate': renewalDate.toIso8601String(),
+      'isTrial': isTrial,
+    };
+  }
+
+  /// Creates a subscription from a JSON map.
+  factory Subscription.fromJson(Map<String, dynamic> json) {
+    return Subscription(
+      id: json['id'],
+      name: json['name'],
+      cost: json['cost'],
+      billingCycle: BillingCycle.values[json['billingCycle']],
+      renewalDate: DateTime.parse(json['renewalDate']),
+      isTrial: json['isTrial'],
+    );
+  }
 }
