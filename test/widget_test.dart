@@ -5,18 +5,26 @@
 // gestures. You can also use WidgetTester to find child widgets in the widget
 // tree, read text, and verify that the values of widget properties are correct.
 
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:subscription_reaper/main.dart';
 
 void main() {
-  testWidgets('Dashboard loads correctly', (WidgetTester tester) async {
+  testWidgets('Intro loads and navigates to Dashboard', (
+    WidgetTester tester,
+  ) async {
     // Build our app and trigger a frame.
     await tester.pumpWidget(const SubscriptionReaperApp());
 
-    // Verify that we start with no targets
+    // Verify Intro Screen loads
+    expect(find.text('THE LEAK'), findsOneWidget);
+    expect(find.text('SKIP'), findsOneWidget);
+
+    // Tap SKIP to go to Dashboard
+    await tester.tap(find.text('SKIP'));
+    await tester.pumpAndSettle();
+
+    // Verify Dashboard loads
     expect(find.text('NO TARGETS FOUND'), findsOneWidget);
-    expect(find.text('0'), findsNothing);
   });
 }
