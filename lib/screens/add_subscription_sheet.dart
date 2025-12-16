@@ -214,7 +214,7 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
                 ),
               ),
 
-              const Spacer(),
+              const SizedBox(height: 32),
 
               // Save Button
               ElevatedButton(
