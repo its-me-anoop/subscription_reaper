@@ -1,16 +1,61 @@
-# subscription_reaper
+# Subscription Reaper
 
-A new Flutter project.
+A "Cyber-Utility" Flutter application designed to track and cancel subscriptions with urgency. It replaces the boring spreadsheet look with a tactical, high-contrast interface that empowers users to cut waste.
 
-## Getting Started
+## 🚀 Features
 
-This project is a starting point for a Flutter application.
+- **The Hit List (Dashboard)**:
+  - Visualizes subscriptions sorted by urgency (Critical < 48h, Warning < 7d).
+  - "Swipe to Kill" interaction to mark subscriptions as cancelled.
+  - Real-time calculation of monthly cost and projected yearly waste.
 
-A few resources to get you started if this is your first Flutter project:
+- **Add Target**:
+  - Quick bottom-sheet interface to add new subscriptions.
+  - "Quick Chips" for fast date entry (+1 Month, +1 Year, etc.).
+  - Supports Monthly, Yearly, and Trial billing cycles.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+- **Execution Room (Detail View)**:
+  - Countdown timer to the exact renewal moment.
+  - "How to Cancel" instructions with copyable links.
+  - Satisfying "Reaped" action to remove the subscription.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## 🎨 Aesthetic: Cyber-Utility
+
+- **Dark Mode by Default**: `#121212` background.
+- **Neon Accents**: High-contrast Neon Red (`#FF3B30`) for danger/costs and Neon Green (`#34C759`) for actions/savings.
+- **Typography**: Monospace fonts (`Roboto Mono`) for data/numbers, Bold Sans-Serif (`Inter`) for headers.
+
+## 🛠️ Tech Stack
+
+- **Flutter**: UI Framework.
+- **Provider**: State Management.
+- **Google Fonts**: Typography.
+- **Intl**: Date formatting.
+- **Uuid**: Unique identifiers.
+
+## 🏃‍♂️ Getting Started
+
+1.  **Clone the repository**:
+    ```bash
+    git clone <repository-url>
+    cd subscription_reaper
+    ```
+
+2.  **Install dependencies**:
+    ```bash
+    flutter pub get
+    ```
+
+3.  **Run the app**:
+    ```bash
+    flutter run
+    ```
+
+## 🧪 Testing
+
+The project includes unit tests for models and providers, and widget tests for the UI.
+
+Run all tests:
+```bash
+flutter test
+```
