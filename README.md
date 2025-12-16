@@ -4,6 +4,10 @@ A "Cyber-Utility" Flutter application designed to track and cancel subscriptions
 
 ## 🚀 Features
 
+- **Onboarding (Intro Screens)**:
+  - Immersive 3-slide carousel explaining the app's philosophy ("The Leak", "The List", "The Reaper").
+  - Smooth transitions and haptic feedback.
+
 - **The Hit List (Dashboard)**:
   - Visualizes subscriptions sorted by urgency (Critical < 48h, Warning < 7d).
   - "Swipe to Kill" interaction to mark subscriptions as cancelled.
