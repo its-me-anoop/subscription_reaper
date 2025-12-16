@@ -72,9 +72,14 @@ void main() {
     await tester.tap(find.text('ADD TO HIT LIST'));
     await tester.pumpAndSettle();
 
+    // Wait for animations (counter and list)
+    await tester.pump(const Duration(seconds: 2));
+
     // Verify on Dashboard
     expect(find.text('Netflix'), findsOneWidget);
-    expect(find.text('\$15.99'), findsOneWidget);
+    // Cost might be formatted differently or animating, so we check if it's present eventually
+    // But since we waited 2 seconds, it should be done.
+    expect(find.text('\$ 15.99'), findsOneWidget);
 
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
@@ -122,5 +127,55 @@ void main() {
     expect(find.text('HIT LIST'), findsOneWidget);
     expect(find.text('Test Sub'), findsNothing);
     expect(find.text('NO TARGETS FOUND'), findsOneWidget);
+  });
+
+  testWidgets('Deleting subscription requires confirmation', (
+    WidgetTester tester,
+  ) async {
+    // Set screen size
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+
+    await tester.pumpWidget(const SubscriptionReaperApp());
+
+    // Skip Intro
+    await tester.tap(find.text('SKIP'));
+    await tester.pumpAndSettle();
+
+    // Add dummy sub
+    final context = tester.element(find.byType(DashboardScreen));
+    context.read<SubscriptionProvider>().addSubscription(
+      Subscription(
+        name: 'Delete Me',
+        cost: 10,
+        billingCycle: BillingCycle.monthly,
+        renewalDate: DateTime.now(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Swipe to delete
+    await tester.drag(find.text('Delete Me'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+
+    // Verify Dialog
+    expect(find.text('CONFIRM KILL?'), findsOneWidget);
+
+    // Cancel
+    await tester.tap(find.text('CANCEL'));
+    await tester.pumpAndSettle();
+    expect(find.text('Delete Me'), findsOneWidget);
+
+    // Swipe again and Execute
+    await tester.drag(find.text('Delete Me'), const Offset(-500, 0));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('EXECUTE'));
+    await tester.pumpAndSettle();
+
+    // Verify deleted
+    expect(find.text('Delete Me'), findsNothing);
+
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
   });
 }

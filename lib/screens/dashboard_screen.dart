@@ -9,6 +9,8 @@ import 'add_subscription_sheet.dart';
 import 'detail_screen.dart';
 import 'settings_screen.dart';
 
+import '../widgets/animated_counter.dart';
+
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
 
@@ -45,24 +47,218 @@ class DashboardScreen extends StatelessWidget {
       body: SafeArea(
         child: Column(
           children: [
-            const _DashboardHeader(),
+            // Header Stats
+            Consumer<SubscriptionProvider>(
+              builder: (context, provider, child) {
+                return Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: AppTheme.kColorBackground,
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.kColorNeonRed.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        spreadRadius: -5,
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "MONTHLY BURN",
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(color: AppTheme.kColorGrey),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            AnimatedCounter(
+                              value: provider.totalMonthlyCost,
+                              prefix: '\$ ',
+                              style: Theme.of(context).textTheme.displayLarge
+                                  ?.copyWith(color: AppTheme.kColorNeonRed),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 16),
+                      Flexible(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              "YEARLY WASTE",
+                              style: Theme.of(context).textTheme.labelLarge
+                                  ?.copyWith(color: AppTheme.kColorGrey),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            AnimatedCounter(
+                              value: provider.yearlyWasteProjection,
+                              prefix: '\$ ',
+                              style: Theme.of(context).textTheme.headlineMedium
+                                  ?.copyWith(color: AppTheme.kColorLightGrey),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+            const Divider(height: 1, color: AppTheme.kColorGrey),
+
+            // Subscription List
             Expanded(
               child: Consumer<SubscriptionProvider>(
                 builder: (context, provider, child) {
                   if (provider.subscriptions.isEmpty) {
                     return Center(
-                      child: Text(
-                        "NO TARGETS FOUND",
-                        style: Theme.of(context).textTheme.bodyMedium,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.radar_outlined,
+                            size: 64,
+                            color: AppTheme.kColorGrey.withValues(alpha: 0.3),
+                          ),
+                          const SizedBox(height: 16),
+                          Text(
+                            "NO TARGETS FOUND",
+                            style: Theme.of(context).textTheme.bodyLarge
+                                ?.copyWith(color: AppTheme.kColorGrey),
+                          ),
+                        ],
                       ),
                     );
                   }
+
                   return ListView.builder(
                     padding: const EdgeInsets.all(16),
                     itemCount: provider.subscriptions.length,
                     itemBuilder: (context, index) {
                       final sub = provider.subscriptions[index];
-                      return _SubscriptionCard(subscription: sub);
+                      // Staggered Animation
+                      return TweenAnimationBuilder<double>(
+                        duration: const Duration(milliseconds: 400),
+                        tween: Tween(begin: 0, end: 1),
+                        curve: Interval(
+                          (1 / provider.subscriptions.length) * index,
+                          1.0,
+                          curve: Curves.easeOutQuad,
+                        ),
+                        builder: (context, value, child) {
+                          return Transform.translate(
+                            offset: Offset(0, 50 * (1 - value)),
+                            child: Opacity(opacity: value, child: child),
+                          );
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.only(bottom: 12),
+                          child: Dismissible(
+                            key: Key(sub.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              decoration: BoxDecoration(
+                                color: AppTheme.kColorNeonRed,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Icon(
+                                Icons.delete_forever,
+                                color: Colors.black,
+                                size: 32,
+                              ),
+                            ),
+                            confirmDismiss: (direction) async {
+                              HapticFeedback.mediumImpact();
+                              return await showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return AlertDialog(
+                                    backgroundColor: AppTheme.kColorBackground,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(16),
+                                      side: const BorderSide(
+                                        color: AppTheme.kColorNeonRed,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    title: Text(
+                                      "CONFIRM KILL?",
+                                      style: Theme.of(context)
+                                          .textTheme
+                                          .headlineMedium
+                                          ?.copyWith(
+                                            color: AppTheme.kColorNeonRed,
+                                          ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    content: Text(
+                                      "Are you sure you want to eliminate ${sub.name}?",
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(false),
+                                        child: Text(
+                                          "CANCEL",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                color: AppTheme.kColorGrey,
+                                              ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.of(context).pop(true),
+                                        child: Text(
+                                          "EXECUTE",
+                                          style: Theme.of(context)
+                                              .textTheme
+                                              .labelLarge
+                                              ?.copyWith(
+                                                color: AppTheme.kColorNeonRed,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  );
+                                },
+                              );
+                            },
+                            onDismissed: (direction) {
+                              HapticFeedback.heavyImpact();
+                              final yearlySavings =
+                                  sub.cost *
+                                  (sub.billingCycle == BillingCycle.monthly
+                                      ? 12
+                                      : 1);
+                              provider.removeSubscription(sub.id);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'ELIMINATED! SAVED \$${yearlySavings.toStringAsFixed(0)}/YR',
+                                  ),
+                                  backgroundColor: AppTheme.kColorNeonGreen,
+                                  duration: const Duration(seconds: 2),
+                                ),
+                              );
+                            },
+                            child: _SubscriptionCard(subscription: sub),
+                          ),
+                        ),
+                      );
                     },
                   );
                 },
@@ -73,7 +269,7 @@ class DashboardScreen extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          HapticFeedback.mediumImpact();
+          HapticFeedback.lightImpact();
           showModalBottomSheet(
             context: context,
             isScrollControlled: true,
@@ -81,62 +277,7 @@ class DashboardScreen extends StatelessWidget {
             builder: (context) => const AddSubscriptionSheet(),
           );
         },
-        child: const Icon(Icons.add, size: 32),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
-  }
-}
-
-class _DashboardHeader extends StatelessWidget {
-  const _DashboardHeader();
-
-  @override
-  Widget build(BuildContext context) {
-    final monthlyCost = context.select<SubscriptionProvider, double>(
-      (p) => p.totalMonthlyCost,
-    );
-    final yearlyWaste = context.select<SubscriptionProvider, double>(
-      (p) => p.yearlyWasteProjection,
-    );
-
-    return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.black,
-        border: Border.all(color: AppTheme.kColorNeonRed, width: 2),
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: AppTheme.kColorNeonRed.withValues(alpha: 0.3),
-            blurRadius: 12,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Text(
-            "\$${monthlyCost.toStringAsFixed(0)}/mo",
-            style: Theme.of(context).textTheme.displayLarge?.copyWith(
-              color: AppTheme.kColorNeonRed,
-              shadows: [
-                Shadow(
-                  color: AppTheme.kColorNeonRed.withValues(alpha: 0.5),
-                  blurRadius: 10,
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            "\$${yearlyWaste.toStringAsFixed(0)}/year projected waste",
-            style: Theme.of(
-              context,
-            ).textTheme.bodyMedium?.copyWith(color: AppTheme.kColorLightGrey),
-          ),
-        ],
+        child: const Icon(Icons.add),
       ),
     );
   }
@@ -182,66 +323,47 @@ class _SubscriptionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dismissible(
-      key: Key(subscription.id),
-      direction: DismissDirection.startToEnd,
-      background: Container(
-        alignment: Alignment.centerLeft,
-        padding: const EdgeInsets.only(left: 20),
-        color: AppTheme.kColorNeonGreen,
-        child: const Icon(Icons.check, color: Colors.black, size: 32),
-      ),
-      onDismissed: (direction) {
-        HapticFeedback.heavyImpact();
-        context.read<SubscriptionProvider>().removeSubscription(
-          subscription.id,
-        );
-        ScaffoldMessenger.of(
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
           context,
-        ).showSnackBar(SnackBar(content: Text('${subscription.name} reaped!')));
-      },
-      child: GestureDetector(
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DetailScreen(subscription: subscription),
-            ),
-          );
-        },
-        child: Container(
-          margin: const EdgeInsets.only(bottom: 12),
-          decoration: BoxDecoration(
-            color: _getCardColor(subscription.status),
-            border: Border.all(color: _getBorderColor(subscription.status)),
-            borderRadius: BorderRadius.circular(12),
+          MaterialPageRoute(
+            builder: (context) => DetailScreen(subscription: subscription),
           ),
-          child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 8,
+        );
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        decoration: BoxDecoration(
+          color: _getCardColor(subscription.status),
+          border: Border.all(color: _getBorderColor(subscription.status)),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: ListTile(
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 8,
+          ),
+          title: Text(
+            subscription.name,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineMedium?.copyWith(fontSize: 18),
+          ),
+          subtitle: Text(
+            _getStatusText(subscription.status, subscription.daysRemaining),
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: subscription.status == SubscriptionStatus.critical
+                  ? AppTheme.kColorNeonRed
+                  : AppTheme.kColorLightGrey,
+              fontWeight: FontWeight.bold,
             ),
-            title: Text(
-              subscription.name,
-              style: Theme.of(
-                context,
-              ).textTheme.headlineMedium?.copyWith(fontSize: 18),
-            ),
-            subtitle: Text(
-              _getStatusText(subscription.status, subscription.daysRemaining),
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: subscription.status == SubscriptionStatus.critical
-                    ? AppTheme.kColorNeonRed
-                    : AppTheme.kColorLightGrey,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            trailing: Text(
-              "\$${subscription.cost.toStringAsFixed(2)}",
-              style: Theme.of(
-                context,
-              ).textTheme.displayLarge?.copyWith(fontSize: 20),
-            ),
+          ),
+          trailing: Text(
+            "\$${subscription.cost.toStringAsFixed(2)}",
+            style: Theme.of(
+              context,
+            ).textTheme.displayLarge?.copyWith(fontSize: 20),
           ),
         ),
       ),
