@@ -7,6 +7,7 @@ import '../providers/subscription_provider.dart';
 import '../theme/app_theme.dart';
 
 import '../widgets/glitch_effect.dart';
+import 'add_subscription_sheet.dart';
 
 class DetailScreen extends StatefulWidget {
   final Subscription subscription;
@@ -162,6 +163,30 @@ class _DetailScreenState extends State<DetailScreen>
             ).textTheme.displayLarge?.copyWith(fontSize: 20, letterSpacing: 2),
           ),
           centerTitle: true,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.edit, color: AppTheme.kColorGrey),
+              onPressed: () async {
+                HapticFeedback.lightImpact();
+                await showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (context) => AddSubscriptionSheet(
+                    key: const Key('add_subscription_sheet'),
+                    subscriptionToEdit: widget.subscription,
+                  ),
+                );
+                // After editing, we need to refresh or pop.
+                // Since the provider updates the object in place, and this widget holds a reference,
+                // we might see stale data unless we pop or listen.
+                // Simplest UX: Pop back to dashboard to see changes.
+                if (mounted) {
+                  Navigator.pop(context);
+                }
+              },
+            ),
+          ],
         ),
         body: Stack(
           children: [

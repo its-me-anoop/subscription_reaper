@@ -56,6 +56,18 @@ class SubscriptionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateSubscription(Subscription updatedSubscription) {
+    final index = _subscriptions.indexWhere(
+      (s) => s.id == updatedSubscription.id,
+    );
+    if (index != -1) {
+      _subscriptions[index] = updatedSubscription;
+      _cachedSortedSubscriptions = null; // Invalidate cache
+      _saveSubscriptions();
+      notifyListeners();
+    }
+  }
+
   /// Removes a subscription by ID.
   void removeSubscription(String id) {
     _subscriptions.removeWhere((sub) => sub.id == id);

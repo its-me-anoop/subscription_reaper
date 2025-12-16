@@ -73,7 +73,9 @@ void main() {
     await tester.pumpAndSettle();
 
     // Wait for animations (counter and list)
-    await tester.pump(const Duration(seconds: 2));
+    // The staggered animation takes time.
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
 
     // Verify on Dashboard
     expect(find.text('Netflix'), findsOneWidget);
@@ -105,6 +107,11 @@ void main() {
       ),
     );
     await tester.pumpAndSettle();
+
+    // Wait for animation
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
     expect(find.text('Test Sub'), findsOneWidget);
 
     // Open Settings
@@ -154,6 +161,10 @@ void main() {
     );
     await tester.pumpAndSettle();
 
+    // Wait for animation
+    await tester.pump(const Duration(seconds: 3));
+    await tester.pumpAndSettle();
+
     // Swipe to delete
     await tester.drag(find.text('Delete Me'), const Offset(-500, 0));
     await tester.pumpAndSettle();
@@ -174,6 +185,81 @@ void main() {
 
     // Verify deleted
     expect(find.text('Delete Me'), findsNothing);
+
+    addTearDown(tester.view.resetPhysicalSize);
+    addTearDown(tester.view.resetDevicePixelRatio);
+  });
+
+  testWidgets('Can edit a subscription', (WidgetTester tester) async {
+    // Set screen size
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+
+    await tester.pumpWidget(const SubscriptionReaperApp());
+
+    // Skip Intro
+    await tester.tap(find.text('SKIP'));
+    await tester.pumpAndSettle();
+
+    // Add dummy sub
+    final context = tester.element(find.byType(DashboardScreen));
+    context.read<SubscriptionProvider>().addSubscription(
+      Subscription(
+        name: 'Edit Me',
+        cost: 10,
+        billingCycle: BillingCycle.monthly,
+        renewalDate: DateTime.now(),
+      ),
+    );
+    await tester.pumpAndSettle();
+
+    // Wait for animations
+    await tester.pump(const Duration(seconds: 3));
+
+    // Open Detail
+    await tester.tap(find.text('Edit Me'));
+    await tester.pumpAndSettle();
+
+    // Click Edit
+    await tester.tap(find.byIcon(Icons.edit));
+    await tester.pumpAndSettle();
+
+    // Verify Edit Sheet
+    expect(find.text('EDIT TARGET'), findsOneWidget);
+    expect(find.text('Edit Me'), findsOneWidget);
+
+    // Change Name
+    await tester.enterText(find.byType(TextFormField).at(0), 'Edited Name');
+    await tester.pumpAndSettle();
+
+    // Verify text changed in sheet
+    expect(find.text('Edited Name'), findsOneWidget);
+
+    // Save
+    await tester.tap(find.text('UPDATE TARGET'));
+    await tester.pumpAndSettle();
+
+    // Verify Sheet Closed
+    expect(find.text('EDIT TARGET'), findsNothing);
+
+    // Verify Detail Screen Closed    // Check if old name is gone
+    if (find.text('Edit Me').evaluate().isNotEmpty) {
+      fail('Old name "Edit Me" still present');
+    }
+
+    // Debug: Print subscriptions
+    final provider = tester
+        .element(find.byType(DashboardScreen))
+        .read<SubscriptionProvider>();
+    // print(
+    //   'Subscriptions: ${provider.subscriptions.map((s) => s.name).toList()}',
+    // );
+
+    expect(provider.subscriptions.first.name, 'Edited Name');
+
+    // Verify Update
+    expect(find.text('Edited Name'), findsOneWidget);
+    expect(find.text('Edit Me'), findsNothing);
 
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);

@@ -142,121 +142,106 @@ class DashboardScreen extends StatelessWidget {
                     itemBuilder: (context, index) {
                       final sub = provider.subscriptions[index];
                       // Staggered Animation
-                      return TweenAnimationBuilder<double>(
-                        duration: const Duration(milliseconds: 400),
-                        tween: Tween(begin: 0, end: 1),
-                        curve: Interval(
-                          (1 / provider.subscriptions.length) * index,
-                          1.0,
-                          curve: Curves.easeOutQuad,
-                        ),
-                        builder: (context, value, child) {
-                          return Transform.translate(
-                            offset: Offset(0, 50 * (1 - value)),
-                            child: Opacity(opacity: value, child: child),
-                          );
-                        },
-                        child: Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: Dismissible(
-                            key: Key(sub.id),
-                            direction: DismissDirection.endToStart,
-                            background: Container(
-                              alignment: Alignment.centerRight,
-                              padding: const EdgeInsets.only(right: 24),
-                              decoration: BoxDecoration(
-                                color: AppTheme.kColorNeonRed,
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                              child: const Icon(
-                                Icons.delete_forever,
-                                color: Colors.black,
-                                size: 32,
-                              ),
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: Dismissible(
+                          key: Key(sub.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 24),
+                            decoration: BoxDecoration(
+                              color: AppTheme.kColorNeonRed,
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            confirmDismiss: (direction) async {
-                              HapticFeedback.mediumImpact();
-                              return await showDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return AlertDialog(
-                                    backgroundColor: AppTheme.kColorBackground,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                      side: const BorderSide(
-                                        color: AppTheme.kColorNeonRed,
-                                        width: 2,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      "CONFIRM KILL?",
-                                      style: Theme.of(context)
-                                          .textTheme
-                                          .headlineMedium
-                                          ?.copyWith(
-                                            color: AppTheme.kColorNeonRed,
-                                          ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    content: Text(
-                                      "Are you sure you want to eliminate ${sub.name}?",
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium,
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(false),
-                                        child: Text(
-                                          "CANCEL",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.copyWith(
-                                                color: AppTheme.kColorGrey,
-                                              ),
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () =>
-                                            Navigator.of(context).pop(true),
-                                        child: Text(
-                                          "EXECUTE",
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .labelLarge
-                                              ?.copyWith(
-                                                color: AppTheme.kColorNeonRed,
-                                              ),
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              );
-                            },
-                            onDismissed: (direction) {
-                              HapticFeedback.heavyImpact();
-                              final yearlySavings =
-                                  sub.cost *
-                                  (sub.billingCycle == BillingCycle.monthly
-                                      ? 12
-                                      : 1);
-                              provider.removeSubscription(sub.id);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'ELIMINATED! SAVED \$${yearlySavings.toStringAsFixed(0)}/YR',
-                                  ),
-                                  backgroundColor: AppTheme.kColorNeonGreen,
-                                  duration: const Duration(seconds: 2),
-                                ),
-                              );
-                            },
-                            child: _SubscriptionCard(subscription: sub),
+                            child: const Icon(
+                              Icons.delete_forever,
+                              color: Colors.black,
+                              size: 32,
+                            ),
                           ),
+                          confirmDismiss: (direction) async {
+                            HapticFeedback.mediumImpact();
+                            return await showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  backgroundColor: AppTheme.kColorBackground,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(16),
+                                    side: const BorderSide(
+                                      color: AppTheme.kColorNeonRed,
+                                      width: 2,
+                                    ),
+                                  ),
+                                  title: Text(
+                                    "CONFIRM KILL?",
+                                    style: Theme.of(context)
+                                        .textTheme
+                                        .headlineMedium
+                                        ?.copyWith(
+                                          color: AppTheme.kColorNeonRed,
+                                        ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  content: Text(
+                                    "Are you sure you want to eliminate ${sub.name}?",
+                                    style: Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium,
+                                    textAlign: TextAlign.center,
+                                  ),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(false),
+                                      child: Text(
+                                        "CANCEL",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              color: AppTheme.kColorGrey,
+                                            ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: () =>
+                                          Navigator.of(context).pop(true),
+                                      child: Text(
+                                        "EXECUTE",
+                                        style: Theme.of(context)
+                                            .textTheme
+                                            .labelLarge
+                                            ?.copyWith(
+                                              color: AppTheme.kColorNeonRed,
+                                            ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            );
+                          },
+                          onDismissed: (direction) {
+                            HapticFeedback.heavyImpact();
+                            final yearlySavings =
+                                sub.cost *
+                                (sub.billingCycle == BillingCycle.monthly
+                                    ? 12
+                                    : 1);
+                            provider.removeSubscription(sub.id);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'ELIMINATED! SAVED \$${yearlySavings.toStringAsFixed(0)}/YR',
+                                ),
+                                backgroundColor: AppTheme.kColorNeonGreen,
+                                duration: const Duration(seconds: 2),
+                              ),
+                            );
+                          },
+                          child: _SubscriptionCard(subscription: sub),
                         ),
                       );
                     },
