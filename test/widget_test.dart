@@ -7,9 +7,19 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 import 'package:subscription_reaper/main.dart';
+import 'package:subscription_reaper/screens/dashboard_screen.dart';
+import 'package:subscription_reaper/providers/subscription_provider.dart';
+import 'package:subscription_reaper/models/subscription.dart';
+
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
+  });
+
   testWidgets('Intro loads and navigates to Dashboard', (
     WidgetTester tester,
   ) async {
@@ -68,5 +78,49 @@ void main() {
 
     addTearDown(tester.view.resetPhysicalSize);
     addTearDown(tester.view.resetDevicePixelRatio);
+  });
+
+  testWidgets('Settings screen opens and nukes database', (
+    WidgetTester tester,
+  ) async {
+    await tester.pumpWidget(const SubscriptionReaperApp());
+
+    // Skip Intro
+    await tester.tap(find.text('SKIP'));
+    await tester.pumpAndSettle();
+
+    // Add a dummy subscription to verify deletion
+    final context = tester.element(find.byType(DashboardScreen));
+    context.read<SubscriptionProvider>().addSubscription(
+      Subscription(
+        name: 'Test Sub',
+        cost: 10,
+        billingCycle: BillingCycle.monthly,
+        renewalDate: DateTime.now(),
+      ),
+    );
+    await tester.pumpAndSettle();
+    expect(find.text('Test Sub'), findsOneWidget);
+
+    // Open Settings
+    await tester.tap(find.byIcon(Icons.settings_outlined));
+    await tester.pumpAndSettle();
+
+    expect(find.text('SYSTEM CONFIG'), findsOneWidget);
+    expect(find.text('NUKE DATABASE'), findsOneWidget);
+
+    // Tap Nuke
+    await tester.tap(find.text('NUKE DATABASE'));
+    await tester.pumpAndSettle();
+
+    // Confirm Dialog
+    expect(find.text('NUKE DATABASE?'), findsOneWidget);
+    await tester.tap(find.text('NUKE IT'));
+    await tester.pumpAndSettle();
+
+    // Verify back on Dashboard and empty
+    expect(find.text('HIT LIST'), findsOneWidget);
+    expect(find.text('Test Sub'), findsNothing);
+    expect(find.text('NO TARGETS FOUND'), findsOneWidget);
   });
 }

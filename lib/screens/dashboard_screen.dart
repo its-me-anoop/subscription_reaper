@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+
 import '../providers/subscription_provider.dart';
 import '../models/subscription.dart';
 import '../theme/app_theme.dart';
 import 'add_subscription_sheet.dart';
 import 'detail_screen.dart';
+import 'settings_screen.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -13,6 +15,33 @@ class DashboardScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.kColorBackground,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: Text(
+          "HIT LIST",
+          style: Theme.of(
+            context,
+          ).textTheme.displayLarge?.copyWith(fontSize: 24, letterSpacing: 2),
+        ),
+        centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(
+              Icons.settings_outlined,
+              color: AppTheme.kColorGrey,
+            ),
+            onPressed: () {
+              HapticFeedback.lightImpact();
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const SettingsScreen()),
+              );
+            },
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Column(
           children: [
@@ -64,8 +93,12 @@ class _DashboardHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final monthlyCost = context.select<SubscriptionProvider, double>((p) => p.totalMonthlyCost);
-    final yearlyWaste = context.select<SubscriptionProvider, double>((p) => p.yearlyWasteProjection);
+    final monthlyCost = context.select<SubscriptionProvider, double>(
+      (p) => p.totalMonthlyCost,
+    );
+    final yearlyWaste = context.select<SubscriptionProvider, double>(
+      (p) => p.yearlyWasteProjection,
+    );
 
     return Container(
       margin: const EdgeInsets.all(16),
@@ -99,9 +132,9 @@ class _DashboardHeader extends StatelessWidget {
           const SizedBox(height: 8),
           Text(
             "\$${yearlyWaste.toStringAsFixed(0)}/year projected waste",
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppTheme.kColorLightGrey,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppTheme.kColorLightGrey),
           ),
         ],
       ),
@@ -160,10 +193,12 @@ class _SubscriptionCard extends StatelessWidget {
       ),
       onDismissed: (direction) {
         HapticFeedback.heavyImpact();
-        context.read<SubscriptionProvider>().removeSubscription(subscription.id);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('${subscription.name} reaped!')),
+        context.read<SubscriptionProvider>().removeSubscription(
+          subscription.id,
         );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('${subscription.name} reaped!')));
       },
       child: GestureDetector(
         onTap: () {
@@ -182,23 +217,30 @@ class _SubscriptionCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
           ),
           child: ListTile(
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 8,
+            ),
             title: Text(
               subscription.name,
-              style: Theme.of(context).textTheme.headlineMedium?.copyWith(fontSize: 18),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineMedium?.copyWith(fontSize: 18),
             ),
             subtitle: Text(
               _getStatusText(subscription.status, subscription.daysRemaining),
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: subscription.status == SubscriptionStatus.critical 
-                    ? AppTheme.kColorNeonRed 
+                color: subscription.status == SubscriptionStatus.critical
+                    ? AppTheme.kColorNeonRed
                     : AppTheme.kColorLightGrey,
                 fontWeight: FontWeight.bold,
               ),
             ),
             trailing: Text(
               "\$${subscription.cost.toStringAsFixed(2)}",
-              style: Theme.of(context).textTheme.displayLarge?.copyWith(fontSize: 20),
+              style: Theme.of(
+                context,
+              ).textTheme.displayLarge?.copyWith(fontSize: 20),
             ),
           ),
         ),

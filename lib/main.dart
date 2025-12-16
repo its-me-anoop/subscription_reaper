@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'providers/subscription_provider.dart';
+import 'providers/settings_provider.dart';
 import 'theme/app_theme.dart';
 import 'screens/intro_screen.dart';
 
@@ -16,6 +17,7 @@ class SubscriptionReaperApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => SubscriptionProvider()),
+        ChangeNotifierProvider(create: (_) => SettingsProvider()),
       ],
       child: MaterialApp(
         title: 'Subscription Reaper',
