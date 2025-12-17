@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
 import '../theme/app_theme.dart';
@@ -147,26 +148,11 @@ class _DetailScreenState extends State<DetailScreen>
   Widget build(BuildContext context) {
     return GlitchEffect(
       active: _isReaping,
-      child: Scaffold(
-        backgroundColor: AppTheme.kColorBackground,
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios, color: AppTheme.kColorGrey),
-            onPressed: () => Navigator.pop(context),
-          ),
-          title: Text(
-            "EXECUTION ROOM",
-            style: Theme.of(
-              context,
-            ).textTheme.displayLarge?.copyWith(fontSize: 20, letterSpacing: 2),
-          ),
-          centerTitle: true,
+      child: AdaptiveScaffold(
+        appBar: AdaptiveAppBar(
+          title: "EXECUTION ROOM",
           actions: [
-            IconButton(
-              icon: const Icon(Icons.edit, color: AppTheme.kColorGrey),
+            AdaptiveAppBarAction(
               onPressed: () async {
                 HapticFeedback.lightImpact();
                 await showModalBottomSheet(
@@ -186,6 +172,7 @@ class _DetailScreenState extends State<DetailScreen>
                   Navigator.pop(context);
                 }
               },
+              icon: Icons.edit,
             ),
           ],
         ),
@@ -297,21 +284,9 @@ class _DetailScreenState extends State<DetailScreen>
                           ),
                         ],
                       ),
-                      child: ElevatedButton(
+                      child: AdaptiveButton(
                         onPressed: _reapSubscription,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.kColorNeonGreen,
-                          foregroundColor: Colors.black,
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: Text(
-                          "I HAVE CANCELED THIS",
-                          style: Theme.of(context).textTheme.displayLarge
-                              ?.copyWith(fontSize: 20, color: Colors.black),
-                        ),
+                        label: "I HAVE CANCELED THIS",
                       ),
                     ),
                   ),

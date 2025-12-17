@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
+
+import '../widgets/liquid_card.dart';
 
 import '../providers/subscription_provider.dart';
 import '../models/subscription.dart';
@@ -16,24 +19,11 @@ class DashboardScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppTheme.kColorBackground,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          "HIT LIST",
-          style: Theme.of(
-            context,
-          ).textTheme.displayLarge?.copyWith(fontSize: 24, letterSpacing: 2),
-        ),
-        centerTitle: true,
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
+        title: "HIT LIST",
         actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.settings_outlined,
-              color: AppTheme.kColorGrey,
-            ),
+          AdaptiveAppBarAction(
             onPressed: () {
               HapticFeedback.lightImpact();
               Navigator.push(
@@ -41,6 +31,7 @@ class DashboardScreen extends StatelessWidget {
                 MaterialPageRoute(builder: (context) => const SettingsScreen()),
               );
             },
+            icon: Icons.settings_outlined,
           ),
         ],
       ),
@@ -50,18 +41,8 @@ class DashboardScreen extends StatelessWidget {
             // Header Stats
             Consumer<SubscriptionProvider>(
               builder: (context, provider, child) {
-                return Container(
+                return LiquidCard(
                   padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: AppTheme.kColorBackground,
-                    boxShadow: [
-                      BoxShadow(
-                        color: AppTheme.kColorNeonRed.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        spreadRadius: -5,
-                      ),
-                    ],
-                  ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -252,7 +233,7 @@ class DashboardScreen extends StatelessWidget {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: AdaptiveFloatingActionButton(
         onPressed: () {
           HapticFeedback.lightImpact();
           showModalBottomSheet(
@@ -272,28 +253,6 @@ class _SubscriptionCard extends StatelessWidget {
   final Subscription subscription;
 
   const _SubscriptionCard({required this.subscription});
-
-  Color _getCardColor(SubscriptionStatus status) {
-    switch (status) {
-      case SubscriptionStatus.critical:
-        return AppTheme.kColorNeonRed.withValues(alpha: 0.2);
-      case SubscriptionStatus.warning:
-        return Colors.yellow.withValues(alpha: 0.2);
-      case SubscriptionStatus.safe:
-        return AppTheme.kColorGrey;
-    }
-  }
-
-  Color _getBorderColor(SubscriptionStatus status) {
-    switch (status) {
-      case SubscriptionStatus.critical:
-        return AppTheme.kColorNeonRed;
-      case SubscriptionStatus.warning:
-        return Colors.yellow;
-      case SubscriptionStatus.safe:
-        return Colors.transparent;
-    }
-  }
 
   String _getStatusText(SubscriptionStatus status, int days) {
     switch (status) {
@@ -317,13 +276,8 @@ class _SubscriptionCard extends StatelessWidget {
           ),
         );
       },
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 12),
-        decoration: BoxDecoration(
-          color: _getCardColor(subscription.status),
-          border: Border.all(color: _getBorderColor(subscription.status)),
-          borderRadius: BorderRadius.circular(12),
-        ),
+      child: LiquidCard(
+        padding: EdgeInsets.zero,
         child: ListTile(
           contentPadding: const EdgeInsets.symmetric(
             horizontal: 16,

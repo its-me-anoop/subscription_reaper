@@ -13,8 +13,8 @@ A "Cyber-Utility" Flutter application designed to track and cancel subscriptions
   - "Swipe to Kill" interaction to mark subscriptions as cancelled.
   - Real-time calculation of monthly cost and projected yearly waste.
 
-- **Add Target**:
-  - Quick bottom-sheet interface to add new subscriptions.
+- **Add & Edit Target**:
+  - Quick bottom-sheet interface to add new subscriptions or edit existing ones.
   - "Quick Chips" for fast date entry (+1 Month, +1 Year, etc.).
   - Supports Monthly, Yearly, and Trial billing cycles.
 
@@ -22,6 +22,11 @@ A "Cyber-Utility" Flutter application designed to track and cancel subscriptions
   - Countdown timer to the exact renewal moment.
   - "How to Cancel" instructions with copyable links.
   - Satisfying "Reaped" action to remove the subscription.
+  - Edit capability to correct details.
+
+- **Persistence & Settings**:
+  - Data is automatically saved locally, ensuring your "Hit List" survives app restarts.
+  - Settings screen to manage data (e.g., "Nuclear Option" to wipe all data).
 
 ## 🎨 Aesthetic: Cyber-Utility
 
@@ -33,6 +38,7 @@ A "Cyber-Utility" Flutter application designed to track and cancel subscriptions
 
 - **Flutter**: UI Framework.
 - **Provider**: State Management.
+- **Shared Preferences**: Local Data Persistence.
 - **Google Fonts**: Typography.
 - **Intl**: Date formatting.
 - **Uuid**: Unique identifiers.

@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:provider/provider.dart';
 import 'package:subscription_reaper/main.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import 'package:subscription_reaper/screens/dashboard_screen.dart';
 import 'package:subscription_reaper/providers/subscription_provider.dart';
 import 'package:subscription_reaper/models/subscription.dart';
@@ -54,17 +55,23 @@ void main() {
 
     // Fill Form
     await tester.enterText(
-      find.ancestor(
-        of: find.text('SERVICE NAME'),
-        matching: find.byType(TextFormField),
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('SERVICE NAME'),
+          matching: find.byType(AdaptiveTextFormField),
+        ),
+        matching: find.byType(EditableText),
       ),
       'Netflix',
     );
 
     await tester.enterText(
-      find.ancestor(
-        of: find.text('COST'),
-        matching: find.byType(TextFormField),
+      find.descendant(
+        of: find.ancestor(
+          of: find.text('COST'),
+          matching: find.byType(AdaptiveTextFormField),
+        ),
+        matching: find.byType(EditableText),
       ),
       '15.99',
     );
@@ -209,7 +216,7 @@ void main() {
     await tester.pumpWidget(
       ChangeNotifierProvider.value(
         value: provider,
-        child: MaterialApp(
+        child: AdaptiveApp(
           home: Scaffold(body: AddSubscriptionSheet(subscriptionToEdit: sub)),
         ),
       ),
@@ -218,7 +225,13 @@ void main() {
     expect(find.text('Old Name'), findsOneWidget);
 
     // Edit Name
-    await tester.enterText(find.byType(TextFormField).at(0), 'New Name');
+    await tester.enterText(
+      find.descendant(
+        of: find.byType(AdaptiveTextFormField).at(0),
+        matching: find.byType(EditableText),
+      ),
+      'New Name',
+    );
     await tester.pumpAndSettle();
 
     // Submit

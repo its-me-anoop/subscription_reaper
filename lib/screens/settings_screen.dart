@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 import '../providers/subscription_provider.dart';
 import '../theme/app_theme.dart';
 
@@ -69,62 +70,118 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final settings = context.watch<SettingsProvider>();
 
-    return Scaffold(
-      backgroundColor: AppTheme.kColorBackground,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        title: Text(
-          "SYSTEM CONFIG",
-          style: Theme.of(
-            context,
-          ).textTheme.displayLarge?.copyWith(fontSize: 24, letterSpacing: 2),
-        ),
-        centerTitle: true,
+    return AdaptiveScaffold(
+      appBar: AdaptiveAppBar(
+        title: "SYSTEM CONFIG",
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.kColorGrey),
           onPressed: () => Navigator.pop(context),
+          icon: const Icon(Icons.arrow_back_ios, color: AppTheme.kColorGrey),
         ),
       ),
       body: ListView(
         padding: const EdgeInsets.all(24),
         children: [
-          _SectionHeader(title: "NOTIFICATIONS"),
-          _SettingsTile(
-            icon: Icons.notifications_active_outlined,
-            title: "RENEWAL ALERTS",
-            subtitle: "Get notified before you pay",
-            trailing: Switch(
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              "NOTIFICATIONS",
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppTheme.kColorNeonGreen,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          AdaptiveListTile(
+            leading: const Icon(
+              Icons.notifications_active_outlined,
+              color: AppTheme.kColorLightGrey,
+            ),
+            title: Text(
+              "RENEWAL ALERTS",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              "Get notified before you pay",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.kColorGrey,
+                fontSize: 12,
+              ),
+            ),
+            trailing: AdaptiveSwitch(
               value: settings.notificationsEnabled,
               onChanged: (val) {
                 HapticFeedback.lightImpact();
                 context.read<SettingsProvider>().toggleNotifications(val);
               },
-              activeColor: AppTheme.kColorNeonGreen,
-              activeTrackColor: AppTheme.kColorNeonGreen.withValues(alpha: 0.3),
             ),
           ),
           const SizedBox(height: 32),
-
-          _SectionHeader(title: "DATA MANAGEMENT"),
-          _SettingsTile(
-            icon: Icons.delete_forever_outlined,
-            title: "NUKE DATABASE",
-            subtitle: "Delete all subscriptions",
-            iconColor: AppTheme.kColorNeonRed,
-            textColor: AppTheme.kColorNeonRed,
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              "DATA MANAGEMENT",
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppTheme.kColorNeonGreen,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          AdaptiveListTile(
+            leading: const Icon(
+              Icons.delete_forever_outlined,
+              color: AppTheme.kColorNeonRed,
+            ),
+            title: Text(
+              "NUKE DATABASE",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppTheme.kColorNeonRed,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              "Delete all subscriptions",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.kColorGrey,
+                fontSize: 12,
+              ),
+            ),
             onTap: () => _nukeDatabase(context),
           ),
           const SizedBox(height: 32),
-
-          _SectionHeader(title: "ABOUT"),
-          _SettingsTile(
-            icon: Icons.info_outline,
-            title: "VERSION",
-            subtitle: "1.0.0 (Cyber-Utility Build)",
+          Padding(
+            padding: const EdgeInsets.only(bottom: 16),
+            child: Text(
+              "ABOUT",
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppTheme.kColorNeonGreen,
+                fontSize: 14,
+              ),
+            ),
+          ),
+          AdaptiveListTile(
+            leading: const Icon(
+              Icons.info_outline,
+              color: AppTheme.kColorLightGrey,
+            ),
+            title: Text(
+              "VERSION",
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            subtitle: Text(
+              "1.0.0 (Cyber-Utility Build)",
+              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppTheme.kColorGrey,
+                fontSize: 12,
+              ),
+            ),
           ),
           const SizedBox(height: 48),
-
           Center(
             child: Text(
               "SUBSCRIPTION REAPER",
@@ -135,88 +192,6 @@ class SettingsScreen extends StatelessWidget {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SectionHeader extends StatelessWidget {
-  final String title;
-
-  const _SectionHeader({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 16),
-      child: Text(
-        title,
-        style: Theme.of(context).textTheme.labelLarge?.copyWith(
-          color: AppTheme.kColorNeonGreen,
-          fontSize: 14,
-        ),
-      ),
-    );
-  }
-}
-
-class _SettingsTile extends StatelessWidget {
-  final IconData icon;
-  final String title;
-  final String? subtitle;
-  final Widget? trailing;
-  final VoidCallback? onTap;
-  final Color? iconColor;
-  final Color? textColor;
-
-  const _SettingsTile({
-    required this.icon,
-    required this.title,
-    this.subtitle,
-    this.trailing,
-    this.onTap,
-    this.iconColor,
-    this.textColor,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
-        child: Row(
-          children: [
-            Icon(icon, color: iconColor ?? AppTheme.kColorLightGrey, size: 28),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: textColor ?? Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  if (subtitle != null) ...[
-                    const SizedBox(height: 4),
-                    Text(
-                      subtitle!,
-                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: AppTheme.kColorGrey,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ],
-              ),
-            ),
-            if (trailing != null) trailing!,
-          ],
-        ),
       ),
     );
   }

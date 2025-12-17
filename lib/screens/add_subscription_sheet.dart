@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:uuid/uuid.dart';
+import 'package:adaptive_platform_ui/adaptive_platform_ui.dart';
 
 import '../models/subscription.dart';
 import '../providers/subscription_provider.dart';
@@ -126,17 +127,10 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
             const SizedBox(height: 32),
 
             // Name Input
-            TextFormField(
+            AdaptiveTextFormField(
               controller: _nameController,
-              style: Theme.of(context).textTheme.bodyLarge,
-              decoration: const InputDecoration(
-                labelText: "SERVICE NAME",
-                hintText: "e.g. Netflix, Spotify",
-                prefixIcon: Icon(
-                  Icons.label_outline,
-                  color: AppTheme.kColorNeonGreen,
-                ),
-              ),
+              placeholder: "SERVICE NAME",
+              prefixIcon: const Icon(Icons.label_outline),
               validator: (value) {
                 if (value == null || value.isEmpty) {
                   return 'Please enter a name';
@@ -147,19 +141,12 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
             const SizedBox(height: 24),
 
             // Cost Input
-            TextFormField(
+            AdaptiveTextFormField(
               controller: _costController,
-              style: Theme.of(context).textTheme.bodyLarge,
+              placeholder: "COST",
+              prefixIcon: const Icon(Icons.attach_money),
               keyboardType: const TextInputType.numberWithOptions(
                 decimal: true,
-              ),
-              decoration: const InputDecoration(
-                labelText: "COST",
-                prefixText: "\$ ",
-                prefixIcon: Icon(
-                  Icons.attach_money,
-                  color: AppTheme.kColorNeonGreen,
-                ),
               ),
               validator: (value) {
                 if (value == null || value.isEmpty) {
@@ -174,26 +161,23 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
             const SizedBox(height: 24),
 
             // Billing Cycle
-            DropdownButtonFormField<BillingCycle>(
-              value: _selectedCycle,
-              dropdownColor: AppTheme.kColorBackground,
-              style: Theme.of(context).textTheme.bodyLarge,
-              decoration: const InputDecoration(
-                labelText: "BILLING CYCLE",
-                prefixIcon: Icon(Icons.update, color: AppTheme.kColorNeonGreen),
+            Text(
+              "BILLING CYCLE",
+              style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                color: AppTheme.kColorGrey,
+                fontSize: 12,
               ),
-              items: BillingCycle.values.map((cycle) {
-                return DropdownMenuItem(
-                  value: cycle,
-                  child: Text(cycle.name.toUpperCase()),
-                );
-              }).toList(),
-              onChanged: (value) {
-                if (value != null) {
-                  setState(() {
-                    _selectedCycle = value;
-                  });
-                }
+            ),
+            const SizedBox(height: 8),
+            AdaptiveSegmentedControl(
+              labels: BillingCycle.values
+                  .map((c) => c.name.toUpperCase())
+                  .toList(),
+              selectedIndex: _selectedCycle.index,
+              onValueChanged: (index) {
+                setState(() {
+                  _selectedCycle = BillingCycle.values[index];
+                });
               },
             ),
             const SizedBox(height: 24),
@@ -201,24 +185,11 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
             // Renewal Date
             InkWell(
               onTap: () async {
-                final picked = await showDatePicker(
+                final picked = await AdaptiveDatePicker.show(
                   context: context,
                   initialDate: _selectedDate,
                   firstDate: DateTime.now().subtract(const Duration(days: 365)),
                   lastDate: DateTime.now().add(const Duration(days: 365 * 5)),
-                  builder: (context, child) {
-                    return Theme(
-                      data: AppTheme.darkTheme.copyWith(
-                        colorScheme: const ColorScheme.dark(
-                          primary: AppTheme.kColorNeonGreen,
-                          onPrimary: Colors.black,
-                          surface: AppTheme.kColorBackground,
-                          onSurface: Colors.white,
-                        ),
-                      ),
-                      child: child!,
-                    );
-                  },
                 );
                 if (picked != null) {
                   setState(() {
@@ -276,26 +247,9 @@ class _AddSubscriptionSheetState extends State<AddSubscriptionSheet> {
             const SizedBox(height: 32),
 
             // Submit Button
-            ElevatedButton(
+            AdaptiveButton(
               onPressed: _submit,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.kColorNeonGreen,
-                foregroundColor: Colors.black,
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                elevation: 8,
-                shadowColor: AppTheme.kColorNeonGreen.withValues(alpha: 0.4),
-              ),
-              child: Text(
-                isEditing ? "UPDATE TARGET" : "ADD TO HIT LIST",
-                style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                  fontSize: 18,
-                  color: Colors.black,
-                  letterSpacing: 1,
-                ),
-              ),
+              label: isEditing ? "UPDATE TARGET" : "ADD TO HIT LIST",
             ),
           ],
         ),

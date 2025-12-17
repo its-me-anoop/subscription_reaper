@@ -48,4 +48,41 @@ class AppTheme {
       ),
     );
   }
+
+  static ThemeData get lightTheme {
+    return ThemeData(
+      brightness: Brightness.light,
+      scaffoldBackgroundColor: kColorWhite,
+      primaryColor: kColorNeonRed,
+      colorScheme: const ColorScheme.light(
+        primary: kColorNeonRed,
+        secondary: kColorNeonGreen,
+        surface: kColorWhite,
+        error: kColorNeonRed,
+      ),
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.robotoMono(
+          fontSize: 32,
+          fontWeight: FontWeight.bold,
+          color: kColorBackground,
+        ),
+        headlineMedium: GoogleFonts.inter(
+          fontSize: 24,
+          fontWeight: FontWeight.bold,
+          color: kColorBackground,
+        ),
+        bodyLarge: GoogleFonts.inter(fontSize: 16, color: kColorBackground),
+        bodyMedium: GoogleFonts.robotoMono(fontSize: 14, color: kColorGrey),
+        labelLarge: GoogleFonts.inter(
+          fontSize: 16,
+          fontWeight: FontWeight.bold,
+          color: kColorWhite,
+        ),
+      ),
+      floatingActionButtonTheme: const FloatingActionButtonThemeData(
+        backgroundColor: kColorNeonGreen,
+        foregroundColor: kColorWhite,
+      ),
+    );
+  }
 }
